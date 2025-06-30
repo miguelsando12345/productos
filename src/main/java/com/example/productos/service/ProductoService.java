@@ -2,7 +2,6 @@ package com.example.productos.service;
 
 import com.example.productos.model.Producto;
 import com.example.productos.repository.ProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,34 +10,25 @@ import java.util.Optional;
 @Service
 public class ProductoService {
 
-    @Autowired
-    private ProductoRepository repo;
+    private final ProductoRepository productoRepository;
 
-    public List<Producto> obtenerTodos() {
-        return repo.findAll();
+    public ProductoService(ProductoRepository productoRepository) {
+        this.productoRepository = productoRepository;
     }
 
-    public Optional<Producto> obtenerPorId(Long id) {
-        return repo.findById(id);
+    public List<Producto> getAllProductos() {
+        return productoRepository.findAll();
     }
 
-    public Producto guardar(Producto producto) {
-        return repo.save(producto);
+    public Optional<Producto> getProductoById(Long id) {
+        return productoRepository.findById(id);
     }
 
-    public void eliminar(Long id) {
-        repo.deleteById(id);
+    public Producto saveProducto(Producto producto) {
+        return productoRepository.save(producto);
     }
 
-    public Producto actualizar(Long id, Producto nuevoProducto) {
-        return repo.findById(id).map(p -> {
-            p.setNombre(nuevoProducto.getNombre());
-            p.setPrecio(nuevoProducto.getPrecio());
-            p.setStock(nuevoProducto.getStock());
-            return repo.save(p);
-        }).orElseGet(() -> {
-            nuevoProducto.setId(id);
-            return repo.save(nuevoProducto);
-        });
+    public void deleteProducto(Long id) {
+        productoRepository.deleteById(id);
     }
 }

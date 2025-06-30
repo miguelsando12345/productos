@@ -2,42 +2,48 @@ package com.example.productos.controller;
 
 import com.example.productos.model.Producto;
 import com.example.productos.service.ProductoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/productos")
-@CrossOrigin(origins = "*")
+@Tag(name = "Productos", description = "Operaciones CRUD para productos")
 public class ProductoController {
 
-    @Autowired
-    private ProductoService service;
+    private final ProductoService productoService;
 
+    public ProductoController(ProductoService productoService) {
+        this.productoService = productoService;
+    }
+
+    @Operation(summary = "Obtener todos los productos")
     @GetMapping
-    public List<Producto> listar() {
-        return service.obtenerTodos();
+    public List<Producto> getAll() {
+        return productoService.getAllProductos();
     }
 
+    @Operation(summary = "Obtener un producto por ID")
     @GetMapping("/{id}")
-    public Optional<Producto> obtenerPorId(@PathVariable Long id) {
-        return service.obtenerPorId(id);
+    public ResponseEntity<Producto> getById(@PathVariable Long id) {
+        return productoService.getProductoById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "Crear un nuevo producto")
     @PostMapping
-    public Producto crear(@RequestBody Producto producto) {
-        return service.guardar(producto);
+    public Producto create(@RequestBody Producto producto) {
+        return productoService.saveProducto(producto);
     }
 
-    @PutMapping("/{id}")
-    public Producto actualizar(@PathVariable Long id, @RequestBody Producto producto) {
-        return service.actualizar(id, producto);
-    }
-
+    @Operation(summary = "Eliminar un producto por ID")
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        service.eliminar(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        productoService.deleteProducto(id);
+        return ResponseEntity.noContent().build();
     }
 }
